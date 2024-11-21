@@ -79,10 +79,20 @@ int main(int argc, char** argv) {
     vector<int> empty_sketch_ids;
     MultiSketchIndex ref_index;
 
+    // Read the query sketch and the reference sketches
+    cout << "Reading sketches" << endl;
     read_min_hashes(arguments.query_path);
     get_sketch_paths(arguments.ref_filelist, ref_sketch_paths);
     read_sketches(ref_sketch_paths, ref_sketches, empty_sketch_ids, arguments.number_of_threads);
+    cout << "Sketch reading done" << endl;
+
+    // Compute the index from the reference sketches
+    cout << "Computing index" << endl;
     compute_index_from_sketches(ref_sketches, ref_index, arguments.number_of_threads);
+    cout << "Index computation done" << endl;
+
+    // show num of hashes in ref
+    cout << "Num of hashes in ref: " << ref_index.size() << endl;
 
     int num_hashes_in_ref = 0;
     for (hash_t hash_value : query_sketch) {

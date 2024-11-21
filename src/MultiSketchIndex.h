@@ -63,6 +63,20 @@ class MultiSketchIndex {
             return multiple_sketch_indices[idx_of_hash].find(hash_value) != multiple_sketch_indices[idx_of_hash].end();
         }
 
+
+        /**
+         * @brief Get the size of the index.
+         * 
+         * @return size_t The size of the index.
+         */
+        size_t size() {
+            size_t total_size = 0;
+            for (int i = 0; i < num_of_indices; i++) {
+                total_size += multiple_sketch_indices[i].size();
+            }
+            return total_size;
+        }
+
         
     private:
         std::vector<std::unordered_map<hash_t, std::vector<int>>> multiple_sketch_indices;

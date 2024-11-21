@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 
         num_iterations++;
 
-        if (num_iterations == 10000) {
+        if (num_iterations == 10) {
             break;
         }
 

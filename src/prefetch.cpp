@@ -86,6 +86,9 @@ int main(int argc, char** argv) {
     read_sketches(ref_sketch_paths, ref_sketches, empty_sketch_ids, arguments.number_of_threads);
     cout << "Sketch reading done" << endl;
 
+    // show num of hashes in query
+    cout << "Num of hashes in query: " << query_sketch.size() << endl;
+
     // Compute the index from the reference sketches
     cout << "Computing index" << endl;
     compute_index_from_sketches(ref_sketches, ref_index, arguments.number_of_threads);

@@ -97,35 +97,48 @@ int main(int argc, char** argv) {
     // show num of hashes in ref
     cout << "Num of hashes in ref: " << ref_index.size() << endl;
 
-    int num_hashes_in_ref = 0;
+    vector<hash_t> query_hashes_present_in_ref;
     for (hash_t hash_value : query_sketch) {
         if ( ref_index.hash_exists(hash_value) ) {
-            num_hashes_in_ref++;
-        }
-   }
-
-    cout << "Number of hashes in ref: " << num_hashes_in_ref << endl;
-
-    vector<size_t> num_intersection_values(ref_sketches.size(), 0);
-    for (hash_t hash_value : query_sketch) {
-        vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
-        for (int ref_id : matching_ref_ids) {
-            num_intersection_values[ref_id]++;
+            query_hashes_present_in_ref.push_back(hash_value);
         }
     }
 
-    // sort the ref sketches by the number of intersections
-    vector<size_t> sorted_indices(ref_sketches.size());
-    iota(sorted_indices.begin(), sorted_indices.end(), 0);
-    sort(sorted_indices.begin(), sorted_indices.end(), [&](size_t i, size_t j) {
-        return num_intersection_values[i] > num_intersection_values[j];
-    });
+    cout << "Number of hashes in query present in ref: " << query_hashes_present_in_ref.size() << endl;
 
-    // show fisrt 10 ref sketches and their intersection values
-    cout << "First 10 ref sketches and their intersection values" << endl;
-    for (int i = 0; i < 10; i++) {
-        cout << "Ref sketch id: " << sorted_indices[i] << " Intersection value: " << num_intersection_values[sorted_indices[i]] << endl;
+    while( true ) {
+        vector<size_t> num_intersection_values(ref_sketches.size(), 0);
+        for (hash_t hash_value : query_hashes_present_in_ref) {
+            vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
+            for (int ref_id : matching_ref_ids) {
+                num_intersection_values[ref_id]++;
+            }
+        }
+        // find the id of the ref sketch with the maximum number of intersections
+        size_t max_intersection_value = 0;
+        size_t max_intersection_ref_id = 0;
+        for (size_t i = 0; i < num_intersection_values.size(); i++) {
+            if (num_intersection_values[i] > max_intersection_value) {
+                max_intersection_value = num_intersection_values[i];
+                max_intersection_ref_id = i;
+            }
+        }
+        if (max_intersection_value == 0) {
+            break;
+        }
+
+        // show match id and match value
+        cout << "Match id: " << max_intersection_ref_id << " Num overlap: " << max_intersection_value << endl;
+
+        // remove the ref sketch with the maximum number of intersections
+        for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {
+            if ( ref_index.hash_exists(hash_value) ) {
+                ref_index.remove_hash(hash_value, max_intersection_ref_id);
+            }
+        }
+
     }
+
 
     return 0;
 

@@ -41,6 +41,15 @@ class MultiSketchIndex {
         void add_hash(hash_t hash_value, std::vector<int> sketch_indices);
 
 
+        /**
+         * @brief Remove a hash value from the index.
+         * 
+         * @param hash_value The hash value to remove.
+         * @param sketch_index The index of the sketch in which this hash value appears.
+         */
+        void remove_hash(hash_t hash_value, int sketch_index);
+
+
 
         /**
          * @brief Get the sketch indices for a hash value.

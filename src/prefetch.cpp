@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
     // Read the query sketch and the reference sketches
     cout << "Reading sketches" << endl;
-    read_min_hashes(arguments.query_path);
+    query_sketch = read_min_hashes(arguments.query_path);
     get_sketch_paths(arguments.ref_filelist, ref_sketch_paths);
     read_sketches(ref_sketch_paths, ref_sketches, empty_sketch_ids, arguments.number_of_threads);
     cout << "Sketch reading done" << endl;
@@ -112,6 +112,19 @@ int main(int argc, char** argv) {
         for (int ref_id : matching_ref_ids) {
             num_intersection_values[ref_id]++;
         }
+    }
+
+    // sort the ref sketches by the number of intersections
+    vector<size_t> sorted_indices(ref_sketches.size());
+    iota(sorted_indices.begin(), sorted_indices.end(), 0);
+    sort(sorted_indices.begin(), sorted_indices.end(), [&](size_t i, size_t j) {
+        return num_intersection_values[i] > num_intersection_values[j];
+    });
+
+    // show fisrt 10 ref sketches and their intersection values
+    cout << "First 10 ref sketches and their intersection values" << endl;
+    for (int i = 0; i < 10; i++) {
+        cout << "Ref sketch id: " << sorted_indices[i] << " Intersection value: " << num_intersection_values[sorted_indices[i]] << endl;
     }
 
     return 0;

@@ -73,12 +73,17 @@ void MultiSketchIndex::remove_hash(hash_t hash_value, int sketch_index) {
 
 
 
-void MultiSketchIndex::remove_hash(hash_t hash_value) {
+std::vector<int> MultiSketchIndex::remove_hash(hash_t hash_value) {
     // Remove the hash value from the index
     int idx_of_hash = index_of_hash(hash_value);
+    std::vector<int> sketch_indices;
     mutexes[idx_of_hash].lock();
     if (hash_exists(hash_value)) {
+        sketch_indices = multiple_sketch_indices[idx_of_hash][hash_value];
         multiple_sketch_indices[idx_of_hash].erase(hash_value);
+    } else {
+        sketch_indices = empty_vector;
     }
     mutexes[idx_of_hash].unlock();
+    return sketch_indices;
 }

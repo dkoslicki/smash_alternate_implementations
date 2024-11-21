@@ -106,23 +106,32 @@ int main(int argc, char** argv) {
 
     cout << "Number of hashes in query present in ref: " << query_hashes_present_in_ref.size() << endl;
 
-    while( true ) {
-        vector<size_t> num_intersection_values(ref_sketches.size(), 0);
-        for (hash_t hash_value : query_hashes_present_in_ref) {
-            vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
-            for (int ref_id : matching_ref_ids) {
-                num_intersection_values[ref_id]++;
-            }
+    size_t* num_intersection_values = new size_t[ref_sketches.size()];
+    for (hash_t hash_value : query_hashes_present_in_ref) {
+        vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
+        for (int ref_id : matching_ref_ids) {
+            num_intersection_values[ref_id]++;
         }
+    }
+
+    // build an unordered map of the hashes in the query sketch
+    unordered_map<hash_t, bool> query_hash_map;
+    for (hash_t hash_value : query_sketch) {
+        query_hash_map[hash_value] = true;
+    }
+
+    while( true ) {
+        
         // find the id of the ref sketch with the maximum number of intersections
         size_t max_intersection_value = 0;
         size_t max_intersection_ref_id = 0;
-        for (size_t i = 0; i < num_intersection_values.size(); i++) {
+        for (size_t i = 0; i < ref_sketches.size(); i++) {
             if (num_intersection_values[i] > max_intersection_value) {
                 max_intersection_value = num_intersection_values[i];
                 max_intersection_ref_id = i;
             }
         }
+
         if (max_intersection_value == 0) {
             break;
         }
@@ -132,8 +141,11 @@ int main(int argc, char** argv) {
 
         // remove the ref sketch with the maximum number of intersections
         for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {
-            if ( ref_index.hash_exists(hash_value) ) {
-                ref_index.remove_hash(hash_value);
+            vector<int> removed_ids = ref_index.remove_hash(hash_value);
+            if (query_hash_map.find(hash_value) != query_hash_map.end()) {
+                for (int ref_id : removed_ids) {
+                    num_intersection_values[ref_id]--;
+                }
             }
         }
 

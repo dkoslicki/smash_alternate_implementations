@@ -120,6 +120,8 @@ int main(int argc, char** argv) {
         query_hash_map[hash_value] = true;
     }
 
+    int num_iterations = 0;
+
     while( true ) {
         
         // find the id of the ref sketch with the maximum number of intersections
@@ -147,6 +149,12 @@ int main(int argc, char** argv) {
                     num_intersection_values[ref_id]--;
                 }
             }
+        }
+
+        num_iterations++;
+
+        if (num_iterations == 10000) {
+            break;
         }
 
     }

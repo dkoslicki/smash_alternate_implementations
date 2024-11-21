@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
         // remove the ref sketch with the maximum number of intersections
         for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {
             if ( ref_index.hash_exists(hash_value) ) {
-                ref_index.remove_hash(hash_value, max_intersection_ref_id);
+                ref_index.remove_hash(hash_value);
             }
         }
 

@@ -70,3 +70,15 @@ void MultiSketchIndex::remove_hash(hash_t hash_value, int sketch_index) {
     }
     mutexes[idx_of_hash].unlock();
 }
+
+
+
+void MultiSketchIndex::remove_hash(hash_t hash_value) {
+    // Remove the hash value from the index
+    int idx_of_hash = index_of_hash(hash_value);
+    mutexes[idx_of_hash].lock();
+    if (hash_exists(hash_value)) {
+        multiple_sketch_indices[idx_of_hash].erase(hash_value);
+    }
+    mutexes[idx_of_hash].unlock();
+}

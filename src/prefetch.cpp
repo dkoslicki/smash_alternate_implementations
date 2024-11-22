@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 
     // Compute the index from the reference sketches
     auto start = chrono::high_resolution_clock::now();
-    cout << "Building an index on all the reference kmers..." << endl;
+    cout << "Building an index on all the reference kmers... (will take some time)" << endl;
     compute_index_from_sketches(ref_sketches, ref_index, arguments.number_of_threads);
     auto end = chrono::high_resolution_clock::now();
     auto duration_in_seconds = chrono::duration_cast<chrono::seconds>(end - start);

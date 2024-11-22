@@ -40,14 +40,22 @@ should be many times faster??
 
 void compute_index_from_sketches_one_chunk( int sketch_index_start, int sketch_index_end,
                                         std::vector<std::vector<hash_t>>& sketches,
-                                        MultiSketchIndex& multi_sketch_index) {
+                                        MultiSketchIndex& multi_sketch_index,
+                                        bool show_progress = false) {
 
 
     for (int i = sketch_index_start; i < sketch_index_end; i++) {
+        if (show_progress) {
+            std::cout << i << '\t' << " of " << (sketch_index_end-sketch_index_start+1) << " sketches processed" << '\r';
+        }
         for (uint j = 0; j < sketches[i].size(); j++) {
             hash_t hash_value = sketches[i][j];
             multi_sketch_index.add_hash(hash_value, i);
         }
+    }
+
+    if (show_progress) {
+        std::cout << std::endl;
     }
 
 
@@ -67,9 +75,10 @@ void compute_index_from_sketches(std::vector<std::vector<hash_t>>& sketches,
     for (int i = 0; i < num_threads; i++) {
         int start_index = i * chunk_size;
         int end_index = (i == num_threads - 1) ? num_sketches : (i + 1) * chunk_size;
+        bool show_progress = (i == num_threads - 1);
         threads.push_back(std::thread(compute_index_from_sketches_one_chunk, 
                                         start_index, end_index, 
-                                        std::ref(sketches), std::ref(multi_sketch_index)));
+                                        std::ref(sketches), std::ref(multi_sketch_index), show_progress));
     }
 
     // join threads

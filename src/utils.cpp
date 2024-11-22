@@ -46,7 +46,9 @@ void compute_index_from_sketches_one_chunk( int sketch_index_start, int sketch_i
 
     for (int i = sketch_index_start; i < sketch_index_end; i++) {
         if (show_progress) {
-            std::cout << i << '\t' << " of " << (sketch_index_end-sketch_index_start+1) << " sketches processed" << '\r';
+            double percentage = 100.0 * (i - sketch_index_start) / (sketch_index_end - sketch_index_start);
+            // show percetage progress
+            std::cout << "\r" << "Progress: " << percentage << "%";
         }
         for (uint j = 0; j < sketches[i].size(); j++) {
             hash_t hash_value = sketches[i][j];

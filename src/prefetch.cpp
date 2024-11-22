@@ -80,22 +80,37 @@ int main(int argc, char** argv) {
     MultiSketchIndex ref_index;
 
     // Read the query sketch and the reference sketches
-    cout << "Reading sketches" << endl;
+    auto read_start = chrono::high_resolution_clock::now();
+    cout << "Reading all reference sketches and the query sketch using " << arguments.number_of_threads << " threads" << endl;
     query_sketch = read_min_hashes(arguments.query_path);
     get_sketch_paths(arguments.ref_filelist, ref_sketch_paths);
     read_sketches(ref_sketch_paths, ref_sketches, empty_sketch_ids, arguments.number_of_threads);
-    cout << "Sketch reading done" << endl;
+    auto read_end = chrono::high_resolution_clock::now();
+    auto read_duration = chrono::duration_cast<chrono::seconds>(read_end - read_start);
+    cout << "Completed reading one query and " << ref_sketches.size() << " reference sketches." << endl;
+    cout << "Reading completed in " << read_duration.count() << " seconds." << endl;
 
-    // show num of hashes in query
-    cout << "Num of hashes in query: " << query_sketch.size() << endl;
+    size_t num_total_hashes_in_ref = 0;
+    for (vector<hash_t> ref_sketch : ref_sketches) {
+        num_total_hashes_in_ref += ref_sketch.size();
+    }
+
+    // show num of hashes in query and ref
+    cout << "Number of kmers in query: " << query_sketch.size() << endl;
+    cout << "Number of kmers in all the references: " << num_total_hashes_in_ref << endl;
 
     // Compute the index from the reference sketches
-    cout << "Computing index" << endl;
+    auto start = chrono::high_resolution_clock::now();
+    cout << "Building an index on all the reference kmers..." << endl;
     compute_index_from_sketches(ref_sketches, ref_index, arguments.number_of_threads);
-    cout << "Index computation done" << endl;
+    auto end = chrono::high_resolution_clock::now();
+    auto duration_in_seconds = chrono::duration_cast<chrono::seconds>(end - start);
+    cout << "Index building completed in " << duration_in_seconds.count() << " seconds." << endl;
 
     // show num of hashes in ref
-    cout << "Num of hashes in ref: " << ref_index.size() << endl;
+    cout << "Number of distinct kmers in the references: " << ref_index.size() << endl;
+
+    cout << "Now searching the query kmers against the references..." << endl;
 
     vector<hash_t> query_hashes_present_in_ref;
     for (hash_t hash_value : query_sketch) {
@@ -103,8 +118,7 @@ int main(int argc, char** argv) {
             query_hashes_present_in_ref.push_back(hash_value);
         }
     }
-
-    cout << "Number of hashes in query present in ref: " << query_hashes_present_in_ref.size() << endl;
+    cout << "Number of kmers in query present in the references: " << query_hashes_present_in_ref.size() << endl;
 
     size_t* num_intersection_values = new size_t[ref_sketches.size()];
     for (size_t i = 0; i < ref_sketches.size(); i++) {

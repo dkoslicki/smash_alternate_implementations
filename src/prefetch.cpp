@@ -43,6 +43,12 @@ void parse_args(int argc, char** argv, Arguments &arguments) {
         .scan<'i', int>()
         .default_value(1)
         .store_into(arguments.number_of_threads);
+    
+    parser.add_argument("-b", "--threshold-bp")
+        .help("The threshold in base pairs")
+        .scan<'i', int>()
+        .default_value(50)
+        .store_into(arguments.threshold_bp);
 
     try {
         parser.parse_args(argc, argv);
@@ -60,6 +66,7 @@ void show_args(Arguments &args) {
     cout << "Ref filelist: " << args.ref_filelist << endl;
     cout << "Output filename: " << args.output_filename << endl;
     cout << "Number of threads: " << args.number_of_threads << endl;
+    cout << "Threshold in base pairs: " << args.threshold_bp << endl;
 } 
 
 
@@ -161,14 +168,20 @@ int main(int argc, char** argv) {
         // find the id of the ref sketch with the maximum number of intersections
         size_t max_intersection_value = 0;
         size_t max_intersection_ref_id = 0;
+
         for (size_t i = 0; i < ref_sketches.size(); i++) {
             if (num_intersection_values[i] > max_intersection_value) {
                 max_intersection_value = num_intersection_values[i];
                 max_intersection_ref_id = i;
+            } else if (num_intersection_values[i] == max_intersection_value) {
+                if ( ref_sketches[i].size() > ref_sketches[max_intersection_ref_id].size() ) {
+                    max_intersection_value = num_intersection_values[i];
+                    max_intersection_ref_id = i;
+                }
             }
         }
 
-        if (max_intersection_value == 0) {
+        if (max_intersection_value < arguments.threshold_bp) {
             break;
         }
 

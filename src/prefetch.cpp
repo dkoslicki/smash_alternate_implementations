@@ -12,6 +12,7 @@ struct Arguments {
     string ref_filelist;
     string output_filename;
     int number_of_threads;
+    int threshold_bp;
 };
 
 
@@ -121,6 +122,7 @@ int main(int argc, char** argv) {
     cout << "Number of kmers in query present in the references: " << query_hashes_present_in_ref.size() << endl;
 
     size_t* num_intersection_values = new size_t[ref_sketches.size()];
+    size_t* num_intersection_values_orig = new size_t[ref_sketches.size()];
     for (size_t i = 0; i < ref_sketches.size(); i++) {
         num_intersection_values[i] = 0;
     }
@@ -128,6 +130,7 @@ int main(int argc, char** argv) {
         vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
         for (int ref_id : matching_ref_ids) {
             num_intersection_values[ref_id]++;
+            num_intersection_values_orig[ref_id]++;
         }
     }
 
@@ -156,7 +159,7 @@ int main(int argc, char** argv) {
         }
 
         // show match id and match value
-        cout << "Match id: " << max_intersection_ref_id << " Num overlap: " << max_intersection_value << endl;
+        cout << "Match id: " << max_intersection_ref_id << " Num overlap now: " << max_intersection_value << ", Num overlap originally: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
 
         // remove the ref sketch with the maximum number of intersections
         for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {

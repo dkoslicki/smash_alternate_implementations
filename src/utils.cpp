@@ -48,7 +48,7 @@ void compute_index_from_sketches_one_chunk( int sketch_index_start, int sketch_i
         if (show_progress) {
             double percentage = 100.0 * (i - sketch_index_start) / (sketch_index_end - sketch_index_start);
             // show percetage progress, only two decimal points
-            std::cout << "\r" << std::fixed << std::setprecision(2) << percentage << "%";
+            std::cout << "\r Progress: " << std::fixed << std::setprecision(2) << percentage << "%";
         }
         for (uint j = 0; j < sketches[i].size(); j++) {
             hash_t hash_value = sketches[i][j];

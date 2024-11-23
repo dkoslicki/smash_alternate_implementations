@@ -125,6 +125,7 @@ int main(int argc, char** argv) {
     size_t* num_intersection_values_orig = new size_t[ref_sketches.size()];
     for (size_t i = 0; i < ref_sketches.size(); i++) {
         num_intersection_values[i] = 0;
+        num_intersection_values_orig[i] = 0;
     }
     for (hash_t hash_value : query_hashes_present_in_ref) {
         vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);

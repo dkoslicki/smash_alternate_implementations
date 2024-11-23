@@ -148,7 +148,6 @@ int main(int argc, char** argv) {
         // re initialize the num_intersection_values to zeros
         for (size_t i = 0; i < ref_sketches.size(); i++) {
             num_intersection_values[i] = 0;
-            num_intersection_values_orig[i] = 0;
         }
 
         // compute intersections again

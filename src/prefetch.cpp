@@ -149,6 +149,7 @@ int main(int argc, char** argv) {
     }
 
     int num_iterations = 0;
+    vector<tuple<int, size_t, size_t>> results;
 
     while( true ) {
         
@@ -174,6 +175,7 @@ int main(int argc, char** argv) {
 
         // show match id and match value
         cout << "Match id: " << max_intersection_ref_id << " Num overlap now: " << max_intersection_value << ", Num overlap originally: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
+        results.push_back(make_tuple(max_intersection_ref_id, max_intersection_value, num_intersection_values_orig[max_intersection_ref_id]));
 
         // remove the ref sketch with the maximum number of intersections
         for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {
@@ -186,6 +188,14 @@ int main(int argc, char** argv) {
         }
 
     }
+
+    // write the results to the output file
+    ofstream output_file(arguments.output_filename);
+    output_file << "ref_id,num_overlap,num_overlap_orig,filename" << endl;
+    for (tuple<int, size_t, size_t> result : results) {
+        output_file << get<0>(result) << "," << get<1>(result) << "," << get<2>(result) << "," << ref_sketch_paths[get<0>(result)] << endl;
+    }
+    output_file.close();
 
 
     return 0;

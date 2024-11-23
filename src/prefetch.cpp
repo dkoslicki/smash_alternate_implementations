@@ -151,19 +151,6 @@ int main(int argc, char** argv) {
     int num_iterations = 0;
 
     while( true ) {
-
-        // re initialize the num_intersection_values to zeros
-        for (size_t i = 0; i < ref_sketches.size(); i++) {
-            num_intersection_values[i] = 0;
-        }
-
-        // compute intersections again
-        for (hash_t hash_value : query_hashes_present_in_ref) {
-            vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
-            for (int ref_id : matching_ref_ids) {
-                num_intersection_values[ref_id]++;
-            }
-        }
         
         // find the id of the ref sketch with the maximum number of intersections
         size_t max_intersection_value = 0;

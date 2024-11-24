@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
                     max_intersection_value = num_intersection_values[i];
                     max_intersection_ref_id = i;
                 } else if ( ref_sketches[i].size() == ref_sketches[max_intersection_ref_id].size() ) {
-                    if ( ref_sketches[i].name.compare(ref_sketches[max_intersection_ref_id].name) <= 0 ) {
+                    if ( ref_sketches[i].name.compare(ref_sketches[max_intersection_ref_id].name) > 0 ) {
                         max_intersection_value = num_intersection_values[i];
                         max_intersection_ref_id = i;
                     }
@@ -215,7 +215,7 @@ int main(int argc, char** argv) {
         }
 
         // show match id and match value
-        cout << "Matched " << max_intersection_ref_id+1 << "-th genome, Num overlap now: " << max_intersection_value << endl;
+        cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;
         results.push_back(make_tuple(max_intersection_ref_id, max_intersection_value, num_intersection_values_orig[max_intersection_ref_id]));
 
         // remove the ref sketch with the maximum number of intersections

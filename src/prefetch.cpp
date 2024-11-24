@@ -165,11 +165,18 @@ int main(int argc, char** argv) {
                 if ( ref_sketches[i].size() >= ref_sketches[max_intersection_ref_id].size() ) {
                     max_intersection_value = num_intersection_values[i];
                     max_intersection_ref_id = i;
+                } else if ( ref_sketches[i].size() == ref_sketches[max_intersection_ref_id].size() ) {
+                    if ( ref_sketches[i].name.compare(ref_sketches[max_intersection_ref_id].name) < 0 ) {
+                        max_intersection_value = num_intersection_values[i];
+                        max_intersection_ref_id = i;
+                    }
                 }
             }
         }
 
         if (max_intersection_value < arguments.threshold_bp) {
+            cout << "Matched " << max_intersection_ref_id+1 << "-th genome, Num overlap now: " << max_intersection_value << endl;
+            cout << "Num overlap is less than the threshold of " << arguments.threshold_bp << " bp. Stopping gather..." << endl;
             break;
         }
 
@@ -190,6 +197,7 @@ int main(int argc, char** argv) {
     }
 
     // write the results to the output file
+    cout << "Writing the results to " << arguments.output_filename << "..." << endl;
     ofstream output_file(arguments.output_filename);
     output_file << "ref_id,num_overlap,num_overlap_orig,name,md5" << endl;
     
@@ -207,6 +215,8 @@ int main(int argc, char** argv) {
 
     output_file.close();
 
+    cout << "Results written to " << arguments.output_filename << endl;
+    cout << "Cleaning up and exiting... (may take some time)" << endl;
 
     return 0;
 

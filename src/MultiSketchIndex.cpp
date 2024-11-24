@@ -1,11 +1,20 @@
 #include "MultiSketchIndex.h"
 
-MultiSketchIndex::MultiSketchIndex() {
+MultiSketchIndex::MultiSketchIndex(int num_of_indices) {
     // Constructor
-    num_of_indices = 4096;
+    this->num_of_indices = num_of_indices;
     multiple_sketch_indices = std::vector<std::unordered_map<hash_t, std::vector<int>>>(num_of_indices);
     mutexes = std::vector<std::mutex>(num_of_indices);
 }
+
+
+MultiSketchIndex::MultiSketchIndex() {
+    // Constructor
+    this->num_of_indices = 4096;
+    multiple_sketch_indices = std::vector<std::unordered_map<hash_t, std::vector<int>>>(num_of_indices);
+    mutexes = std::vector<std::mutex>(num_of_indices);
+}
+
 
 MultiSketchIndex::~MultiSketchIndex() {
     // Destructor

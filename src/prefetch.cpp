@@ -35,6 +35,7 @@ struct Arguments {
     string output_filename;
     int number_of_threads;
     int threshold_bp;
+    int num_hashtables;
 };
 
 
@@ -72,6 +73,12 @@ void parse_args(int argc, char** argv, Arguments &arguments) {
         .default_value(50)
         .store_into(arguments.threshold_bp);
 
+    parser.add_argument("-n", "--num-hashtables")
+        .help("The number of hash tables to use")
+        .scan<'i', int>()
+        .default_value(4096)
+        .store_into(arguments.num_hashtables);
+
     try {
         parser.parse_args(argc, argv);
     } catch (const std::runtime_error &err) {
@@ -91,6 +98,7 @@ void show_args(Arguments &args) {
     cout << "*   Output filename: " << args.output_filename << endl;
     cout << "*   Number of threads: " << args.number_of_threads << endl;
     cout << "*   Threshold in base pairs: " << args.threshold_bp << endl;
+    cout << "*   Number of hash tables in the index: " << args.num_hashtables << endl;
     cout << "*" << endl;
     cout << "**************************************" << endl;
 } 
@@ -111,7 +119,7 @@ int main(int argc, char** argv) {
     vector<string> ref_sketch_paths;
     vector<Sketch> ref_sketches;
     vector<int> empty_sketch_ids;
-    MultiSketchIndex ref_index;
+    MultiSketchIndex ref_index(arguments.num_hashtables);
 
     // Read the query sketch and the reference sketches
     auto read_start = chrono::high_resolution_clock::now();

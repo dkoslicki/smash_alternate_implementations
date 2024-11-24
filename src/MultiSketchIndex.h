@@ -19,6 +19,7 @@ typedef unsigned long long int hash_t;
  */
 class MultiSketchIndex {
     public:
+        MultiSketchIndex(int num_of_indices);
         MultiSketchIndex();
         ~MultiSketchIndex();
 

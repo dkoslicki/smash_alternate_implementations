@@ -22,6 +22,9 @@
 #include <random>
 #include <exception>
 
+#include <sys/resource.h>
+#include <cstdlib>
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -81,11 +84,15 @@ void parse_args(int argc, char** argv, Arguments &arguments) {
 
 
 void show_args(Arguments &args) {
-    cout << "Query path: " << args.query_path << endl;
-    cout << "Ref filelist: " << args.ref_filelist << endl;
-    cout << "Output filename: " << args.output_filename << endl;
-    cout << "Number of threads: " << args.number_of_threads << endl;
-    cout << "Threshold in base pairs: " << args.threshold_bp << endl;
+    cout << "**************************************" << endl;
+    cout << "*" << endl;
+    cout << "*   Query path: " << args.query_path << endl;
+    cout << "*   Ref filelist: " << args.ref_filelist << endl;
+    cout << "*   Output filename: " << args.output_filename << endl;
+    cout << "*   Number of threads: " << args.number_of_threads << endl;
+    cout << "*   Threshold in base pairs: " << args.threshold_bp << endl;
+    cout << "*" << endl;
+    cout << "**************************************" << endl;
 } 
 
 
@@ -185,7 +192,7 @@ int main(int argc, char** argv) {
                     max_intersection_value = num_intersection_values[i];
                     max_intersection_ref_id = i;
                 } else if ( ref_sketches[i].size() == ref_sketches[max_intersection_ref_id].size() ) {
-                    if ( ref_sketches[i].name.compare(ref_sketches[max_intersection_ref_id].name) < 0 ) {
+                    if ( ref_sketches[i].name.compare(ref_sketches[max_intersection_ref_id].name) <= 0 ) {
                         max_intersection_value = num_intersection_values[i];
                         max_intersection_ref_id = i;
                     }
@@ -240,7 +247,9 @@ int main(int argc, char** argv) {
 
     delete[] num_intersection_values;
     delete[] num_intersection_values_orig;
-    terminate();    
+    struct rlimit limit = {0, 0};
+    setrlimit(RLIMIT_CORE, &limit);
+    terminate();
 
     return 0;
 

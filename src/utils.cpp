@@ -1,6 +1,6 @@
 #include "utils.h"
 
-std::vector<hash_t> read_min_hashes(const std::string& json_filename) {
+Sketch read_min_hashes(const std::string& json_filename) {
 
     // Open the JSON file
     std::ifstream inputFile(json_filename);
@@ -17,11 +17,18 @@ std::vector<hash_t> read_min_hashes(const std::string& json_filename) {
 
     // Access and print values
     std::vector<hash_t> min_hashes = jsonData[0]["signatures"][0]["mins"];
+    std::string name = jsonData[0]["name"];
+    std::string md5 = jsonData[0]["signatures"][0]["md5sum"];
+    int ksize = jsonData[0]["signatures"][0]["ksize"];
+    hash_t max_hash = jsonData[0]["signatures"][0]["max_hash"];
+    int seed = jsonData[0]["signatures"][0]["seed"];
 
     // Close the file
     inputFile.close();
 
-    return min_hashes;
+    Sketch sketch(min_hashes, json_filename, name, md5, ksize, max_hash, seed);
+    return sketch;
+
 }
 
 
@@ -39,7 +46,7 @@ should be many times faster??
 
 
 void compute_index_from_sketches_one_chunk( int sketch_index_start, int sketch_index_end,
-                                        std::vector<std::vector<hash_t>>& sketches,
+                                        std::vector<Sketch>& sketches,
                                         MultiSketchIndex& multi_sketch_index,
                                         bool show_progress = false) {
 
@@ -66,7 +73,7 @@ void compute_index_from_sketches_one_chunk( int sketch_index_start, int sketch_i
 
 
 
-void compute_index_from_sketches(std::vector<std::vector<hash_t>>& sketches, 
+void compute_index_from_sketches(std::vector<Sketch>& sketches, 
                                     MultiSketchIndex& multi_sketch_index,
                                     const int num_threads) {
     
@@ -111,7 +118,7 @@ void get_sketch_paths(const std::string& filelist, std::vector<std::string>& ske
 
 void read_sketches_one_chunk(int start_index, int end_index, 
                             std::vector<std::string>& sketch_paths,
-                            std::vector<std::vector<hash_t>>& sketches,
+                            std::vector<Sketch>& sketches,
                             std::mutex& mutex_count_empty_sketch,
                             std::vector<int>& empty_sketch_ids) {
 
@@ -129,13 +136,13 @@ void read_sketches_one_chunk(int start_index, int end_index,
 
 
 void read_sketches(std::vector<std::string>& sketch_paths,
-                        std::vector<std::vector<hash_t>>& sketches, 
+                        std::vector<Sketch>& sketches, 
                         std::vector<int>& empty_sketch_ids, 
                         const uint num_threads) {
 
     uint num_sketches = sketch_paths.size();
     for (uint i = 0; i < num_sketches; i++) {
-        sketches.push_back( std::vector<hash_t>() );
+        sketches.push_back( Sketch() );
     }
 
     std::mutex mutex_count_empty_sketch;
@@ -179,8 +186,8 @@ void show_empty_sketches(const std::vector<int>& empty_sketch_ids) {
 void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int query_sketch_end_index, 
                                             int thread_id, std::string out_dir, 
                                             int pass_id, int negative_offset,
-                                            const std::vector<std::vector<hash_t>>& sketches_query,
-                                            const std::vector<std::vector<hash_t>>& sketches_ref,
+                                            std::vector<Sketch>& sketches_query,
+                                            std::vector<Sketch>& sketches_ref,
                                             MultiSketchIndex& multi_sketch_index_ref,
                                             int** intersectionMatrix, 
                                             double containment_threshold,
@@ -250,8 +257,8 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
 
 
 
-void compute_intersection_matrix(const std::vector<std::vector<hash_t>>& sketches_query,
-                                const std::vector<std::vector<hash_t>>& sketches_ref, 
+void compute_intersection_matrix(const std::vector<Sketch>& sketches_query,
+                                const std::vector<Sketch>& sketches_ref, 
                                 MultiSketchIndex& multi_sketch_index_ref,
                                 const std::string& out_dir, 
                                 std::vector<std::vector<int>>& similars,

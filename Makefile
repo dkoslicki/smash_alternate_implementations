@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -O3 -std=c++17
 TARGET = prefetch
-SRCS = src/prefetch.cpp src/utils.cpp src/MultiSketchIndex.cpp
+SRCS = src/prefetch.cpp src/utils.cpp src/MultiSketchIndex.cpp src/Sketch.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)

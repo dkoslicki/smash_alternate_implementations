@@ -81,9 +81,9 @@ int main(int argc, char** argv) {
     parse_args(argc, argv, arguments);
     show_args(arguments);
 
-    vector<hash_t> query_sketch; 
+    Sketch query_sketch; 
     vector<string> ref_sketch_paths;
-    vector<vector<hash_t>> ref_sketches;
+    vector<Sketch> ref_sketches;
     vector<int> empty_sketch_ids;
     MultiSketchIndex ref_index;
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
     cout << "Reading completed in " << read_duration.count() << " seconds." << endl;
 
     size_t num_total_hashes_in_ref = 0;
-    for (vector<hash_t> ref_sketch : ref_sketches) {
+    for (Sketch ref_sketch : ref_sketches) {
         num_total_hashes_in_ref += ref_sketch.size();
     }
 
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     cout << "Now searching the query kmers against the references..." << endl;
 
     vector<hash_t> query_hashes_present_in_ref;
-    for (hash_t hash_value : query_sketch) {
+    for (hash_t hash_value : query_sketch.hashes) {
         if ( ref_index.hash_exists(hash_value) ) {
             query_hashes_present_in_ref.push_back(hash_value);
         }
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 
     // build an unordered map of the hashes in the query sketch
     unordered_map<hash_t, bool> query_hash_map;
-    for (hash_t hash_value : query_sketch) {
+    for (hash_t hash_value : query_sketch.hashes) {
         query_hash_map[hash_value] = true;
     }
 
@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
         results.push_back(make_tuple(max_intersection_ref_id, max_intersection_value, num_intersection_values_orig[max_intersection_ref_id]));
 
         // remove the ref sketch with the maximum number of intersections
-        for (hash_t hash_value : ref_sketches[max_intersection_ref_id]) {
+        for (hash_t hash_value : ref_sketches[max_intersection_ref_id].hashes) {
             vector<int> removed_ids = ref_index.remove_hash(hash_value);
             if (query_hash_map.find(hash_value) != query_hash_map.end()) {
                 for (int ref_id : removed_ids) {
@@ -191,10 +191,20 @@ int main(int argc, char** argv) {
 
     // write the results to the output file
     ofstream output_file(arguments.output_filename);
-    output_file << "ref_id,num_overlap,num_overlap_orig,filename" << endl;
+    output_file << "ref_id,num_overlap,num_overlap_orig,file_path,name,md5" << endl;
+    
     for (tuple<int, size_t, size_t> result : results) {
-        output_file << get<0>(result) << "," << get<1>(result) << "," << get<2>(result) << "," << ref_sketch_paths[get<0>(result)] << endl;
+        
+        int sketch_index = get<0>(result);
+        int num_overlap = get<1>(result);
+        int num_overlap_orig = get<2>(result);
+        string file_path = ref_sketches[sketch_index].file_path;
+        string name = ref_sketches[sketch_index].name;
+        string md5 = ref_sketches[sketch_index].md5;
+        
+        output_file << sketch_index << "," << num_overlap << "," << num_overlap_orig << "," << file_path << "," << name << "," << md5 << endl;
     }
+
     output_file.close();
 
 

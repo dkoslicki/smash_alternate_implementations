@@ -23,6 +23,7 @@
 
 #include "json.hpp"
 #include "MultiSketchIndex.h"
+#include "Sketch.h"
 
 using json = nlohmann::json;
 
@@ -42,7 +43,7 @@ typedef unsigned long long int hash_t;
  * 
  * @param sketch_path The path to the sketch file
  */
-std::vector<hash_t> read_min_hashes(const std::string& sketch_path);
+Sketch read_min_hashes(const std::string& sketch_path);
 
 
 
@@ -56,7 +57,7 @@ std::vector<hash_t> read_min_hashes(const std::string& sketch_path);
  * @param hash_index The reference to the hash index (where the index will be stored)
  * @param num_threads The number of threads to use
  */
-void compute_index_from_sketches(std::vector<std::vector<hash_t>>& sketches, 
+void compute_index_from_sketches(std::vector<Sketch>& sketches, 
                             MultiSketchIndex& multi_sketch_index,
                             int num_threads);
 
@@ -87,7 +88,7 @@ void get_sketch_paths(const std::string& filelist, std::vector<std::string>& ske
  * @param num_threads The number of threads to use
  */
 void read_sketches(std::vector<std::string>& sketch_paths,
-                        std::vector<std::vector<hash_t>>& sketches, 
+                        std::vector<Sketch>& sketches, 
                         std::vector<int>& empty_sketch_ids, 
                         const uint num_threads);
 
@@ -117,8 +118,8 @@ void show_empty_sketches(const std::vector<int>&);
  * @param num_passes The number of passes to use
  * @param num_threads The number of threads to use
  */
-void compute_intersection_matrix(const std::vector<std::vector<hash_t>>& sketches_query,
-                                const std::vector<std::vector<hash_t>>& sketches_ref, 
+void compute_intersection_matrix(const std::vector<Sketch>& sketches_query,
+                                const std::vector<Sketch>& sketches_ref, 
                                 MultiSketchIndex& multi_sketch_index_ref,
                                 const std::string& out_dir, 
                                 std::vector<std::vector<int>>& similars,

@@ -1,5 +1,5 @@
-#ifndef SKETCH_H
-#define SKETCH_H
+#ifndef SKETCHINDEX_H
+#define SKETCHINDEX_H
 
 #include <iostream>
 #include <vector>

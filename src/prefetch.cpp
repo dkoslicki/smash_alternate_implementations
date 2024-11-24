@@ -3,6 +3,25 @@
 #include "utils.h"
 #include "MultiSketchIndex.h"
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <chrono>
+#include <unordered_map>
+#include <tuple>
+#include <algorithm>
+#include <unordered_set>
+#include <set>
+#include <thread>
+#include <mutex>
+#include <cmath>
+#include <limits>
+#include <iomanip>
+#include <sstream>
+#include <random>
+#include <exception>
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -191,6 +210,7 @@ int main(int argc, char** argv) {
                 for (int ref_id : removed_ids) {
                     num_intersection_values[ref_id]--;
                 }
+                query_hash_map.erase(hash_value);
             }
         }
 
@@ -217,6 +237,10 @@ int main(int argc, char** argv) {
 
     cout << "Results written to " << arguments.output_filename << endl;
     cout << "Cleaning up and exiting... (may take some time)" << endl;
+
+    delete[] num_intersection_values;
+    delete[] num_intersection_values_orig;
+    terminate();    
 
     return 0;
 

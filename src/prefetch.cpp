@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
                 max_intersection_value = num_intersection_values[i];
                 max_intersection_ref_id = i;
             } else if (num_intersection_values[i] == max_intersection_value) {
-                if ( ref_sketches[i].size() > ref_sketches[max_intersection_ref_id].size() ) {
+                if ( ref_sketches[i].size() >= ref_sketches[max_intersection_ref_id].size() ) {
                     max_intersection_value = num_intersection_values[i];
                     max_intersection_ref_id = i;
                 }
@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
         }
 
         // show match id and match value
-        cout << "Match id: " << max_intersection_ref_id << " Num overlap now: " << max_intersection_value << ", Num overlap originally: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
+        cout << "Matched " << max_intersection_ref_id+1 << "-th genome, Num overlap now: " << max_intersection_value << endl;
         results.push_back(make_tuple(max_intersection_ref_id, max_intersection_value, num_intersection_values_orig[max_intersection_ref_id]));
 
         // remove the ref sketch with the maximum number of intersections
@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
 
     // write the results to the output file
     ofstream output_file(arguments.output_filename);
-    output_file << "ref_id,num_overlap,num_overlap_orig,file_path,name,md5" << endl;
+    output_file << "ref_id,num_overlap,num_overlap_orig,name,md5" << endl;
     
     for (tuple<int, size_t, size_t> result : results) {
         
@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
         string name = ref_sketches[sketch_index].name;
         string md5 = ref_sketches[sketch_index].md5;
         
-        output_file << sketch_index << "," << num_overlap << "," << num_overlap_orig << "," << file_path << "," << name << "," << md5 << endl;
+        output_file << sketch_index << "," << num_overlap << "," << num_overlap_orig << ",\"" << name << "\"," << md5 << endl;
     }
 
     output_file.close();

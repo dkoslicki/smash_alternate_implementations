@@ -301,12 +301,12 @@ void compute_intersection_matrix(const std::vector<Sketch>& sketches_query,
             int start_query_index_this_thread = sketch_idx_start_this_pass + i * chunk_size;
             int end_query_index_this_thread = (i == num_threads - 1) ? sketch_idx_end_this_pass : sketch_idx_start_this_pass + (i + 1) * chunk_size;
             threads.push_back(std::thread(compute_intersection_matrix_by_sketches, 
-                            start_query_index_this_thread, end_query_index_this_thread, 
-                            i, out_dir, pass_id, negative_offset,
-                            std::ref(sketches_query), std::ref(sketches_ref), 
-                            std::ref(multi_sketch_index_ref), intersectionMatrix, 
-                            containment_threshold,
-                            std::ref(similars)));
+                                            start_query_index_this_thread, end_query_index_this_thread, 
+                                            i, out_dir, pass_id, negative_offset, 
+                                            std::ref(sketches_query), std::ref(sketches_ref), 
+                                            std::ref(multi_sketch_index_ref), 
+                                            intersectionMatrix, containment_threshold, 
+                                            std::ref(similars)));
         }
 
         // join threads

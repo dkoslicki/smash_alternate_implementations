@@ -119,7 +119,7 @@ void do_gather(Arguments& args) {
 
     int num_iterations = 0;
     vector<tuple<
-                int, size_t, size_t,double
+                int, size_t, size_t, double, double, double, double
                     >> results;
 
     while( true ) {
@@ -145,7 +145,10 @@ void do_gather(Arguments& args) {
         }
 
         // compute the relevant values
-        double f_unique_to_query = (double)max_intersection_value / (double)query_sketch.size();
+        double f_unique_query = (double)max_intersection_value / (double)query_sketch.size();
+        double f_unique_weighted = f_unique_query;
+        double f_orig_query = (double)num_intersection_values_orig[max_intersection_ref_id] / (double)query_sketch.size();
+        double f_match = (double)num_intersection_values_orig[max_intersection_ref_id] / (double)ref_sketches[max_intersection_ref_id].size();
 
         // show match id and match value
         cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;
@@ -153,7 +156,10 @@ void do_gather(Arguments& args) {
             make_tuple(max_intersection_ref_id, 
                         max_intersection_value, 
                         num_intersection_values_orig[max_intersection_ref_id],
-                        f_unique_to_query));
+                        f_unique_query,
+                        f_unique_weighted,
+                        f_orig_query,
+                        f_match));
 
         // remove the ref sketch with the maximum number of intersections
         for (hash_t hash_value : ref_sketches[max_intersection_ref_id].hashes) {
@@ -176,20 +182,26 @@ void do_gather(Arguments& args) {
     // write the results to the output file
     cout << "Writing the results to " << args.output_filename << "..." << endl;
     ofstream output_file(args.output_filename);
-    output_file << "ref_id,num_overlap,num_overlap_orig,name,md5,f_unique_to_query" << endl;
+    output_file << "num_overlap_orig,num_overlap,f_orig_query,f_match,f_unique_query,f_weighted_query,name,md5" << endl;
+    output_file << fixed << setprecision(10);
     
     for (auto result : results) {
         int sketch_index = get<0>(result);
         int num_overlap = get<1>(result);
         int num_overlap_orig = get<2>(result);
         double f_unique_to_query = get<3>(result);
+        double f_unique_weighted = get<4>(result);
+        double f_orig_query = get<5>(result);
+        double f_match = get<6>(result);
+
         string file_path = ref_sketches[sketch_index].file_path;
         string name = ref_sketches[sketch_index].name;
         string md5 = ref_sketches[sketch_index].md5;
         
-        output_file << sketch_index << "," << num_overlap << "," 
-                    << num_overlap_orig << ",\"" << name << "\"," 
-                    << md5 << "," << f_unique_to_query << endl;
+        output_file << num_overlap_orig << "," << num_overlap << "," 
+                    << f_orig_query << "," << f_match << "," 
+                    << f_unique_to_query << "," << f_unique_weighted 
+                    << "," << name << "," << md5 << endl;
     }
 
     output_file.close();

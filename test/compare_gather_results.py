@@ -16,9 +16,28 @@ def main():
     df_sourmash_gather = pd.read_csv(args.sourmash_gather_file).set_index('md5')
     df_alternate_gather = pd.read_csv(args.alternate_gather_file).set_index('md5')
 
+    sourmash_gather_md5s_list = df_sourmash_gather.index.tolist()
+    alternate_gather_md5s_list = df_alternate_gather.index.tolist()
+
+    for i in range(len(sourmash_gather_md5s_list)):
+        if sourmash_gather_md5s_list[i] != alternate_gather_md5s_list[i]:
+            print(f"First md5s different at index {i}")
+            print(f"sourmash gather md5: {sourmash_gather_md5s_list[i]}")
+            print(f"alternate gather md5: {alternate_gather_md5s_list[i]}")
+            print('--------')
+
+            # show next five md5s
+            print('next five md5s')
+            for j in range(i+1, i+6):
+                print(f"sourmash gather md5: {sourmash_gather_md5s_list[j]}")
+                print(f"alternate gather md5: {alternate_gather_md5s_list[j]}")
+                print('--------')
+
     sourmash_gather_md5s = set(df_sourmash_gather.index)
     alternate_gather_md5s = set(df_alternate_gather.index)
     commond_md5s = sourmash_gather_md5s & alternate_gather_md5s
+
+
 
     # show some stats
     print(f"Number of md5s in sourmash gather: {len(sourmash_gather_md5s)}")

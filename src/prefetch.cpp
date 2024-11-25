@@ -148,7 +148,7 @@ void do_gather(Arguments& args) {
         double f_unique_query = (double)max_intersection_value / (double)query_sketch.size();
         double f_unique_weighted = f_unique_query;
         double f_orig_query = (double)num_intersection_values_orig[max_intersection_ref_id] / (double)query_sketch.size();
-        double f_match = (double)num_intersection_values_orig[max_intersection_ref_id] / (double)ref_sketches[max_intersection_ref_id].size();
+        double f_match = (double)max_intersection_value / (double)ref_sketches[max_intersection_ref_id].size();
 
         // show match id and match value
         cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;

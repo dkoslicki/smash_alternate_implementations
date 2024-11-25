@@ -201,7 +201,7 @@ void do_gather(Arguments& args) {
         output_file << num_overlap_orig << "," << num_overlap << "," 
                     << f_orig_query << "," << f_match << "," 
                     << f_unique_to_query << "," << f_unique_weighted 
-                    << "," << name << "," << md5 << endl;
+                    << ",\"" << name << "\"," << md5 << endl;
     }
 
     output_file.close();

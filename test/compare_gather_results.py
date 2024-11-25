@@ -33,7 +33,7 @@ def main():
         alternate_gather_row = df_alternate_gather.loc[md5]
 
         # test sourmash_gather_row's intersect_bp is the same as alternate_gather_row's num_overlap_orig
-        assert sourmash_gather_row['intersect_bp'] == alternate_gather_row['num_overlap_orig']
+        assert sourmash_gather_row['intersect_bp'] == alternate_gather_row['num_overlap_orig']*1000
         assert abs(sourmash_gather_row['f_orig_query'] - alternate_gather_row['f_orig_query']) < 0.0001
         assert abs(sourmash_gather_row['f_match'] - alternate_gather_row['f_match']) < 0.0001
         assert abs(sourmash_gather_row['f_unique_to_query'] - alternate_gather_row['f_unique_query']) < 0.0001

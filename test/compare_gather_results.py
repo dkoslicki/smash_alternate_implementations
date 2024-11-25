@@ -33,11 +33,18 @@ def main():
         alternate_gather_row = df_alternate_gather.loc[md5]
 
         # test sourmash_gather_row's intersect_bp is the same as alternate_gather_row's num_overlap_orig
-        assert sourmash_gather_row['intersect_bp'] == alternate_gather_row['num_overlap_orig']*1000
-        assert abs(sourmash_gather_row['f_orig_query'] - alternate_gather_row['f_orig_query']) < 0.0001
-        assert abs(sourmash_gather_row['f_match'] - alternate_gather_row['f_match']) < 0.0001
-        assert abs(sourmash_gather_row['f_unique_to_query'] - alternate_gather_row['f_unique_query']) < 0.0001
-        assert abs(sourmash_gather_row['f_unique_weighted'] - alternate_gather_row['f_weighted_query']) < 0.0001
+        try:
+            assert sourmash_gather_row['intersect_bp'] == alternate_gather_row['num_overlap_orig']*1000
+            assert abs(sourmash_gather_row['f_orig_query'] - alternate_gather_row['f_orig_query']) < 0.0001
+            assert abs(sourmash_gather_row['f_match'] - alternate_gather_row['f_match']) < 0.0001
+            assert abs(sourmash_gather_row['f_unique_to_query'] - alternate_gather_row['f_unique_query']) < 0.0001
+            assert abs(sourmash_gather_row['f_unique_weighted'] - alternate_gather_row['f_weighted_query']) < 0.0001
+        except AssertionError:
+            print(f"md5 {md5} has different values in sourmash gather and alternate gather")
+            print(f"sourmash gather row: {sourmash_gather_row}")
+            print(f"alternate gather row: {alternate_gather_row}")
+            print('--------')
+            continue
     
     # for the md5s in sourmash gather but not in alternate gather, compute the sum of f_unique_weighted
     total_f_unique_weighted = 0

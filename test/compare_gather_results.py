@@ -62,5 +62,13 @@ def main():
 
     print(f"Total f_weighted_query for md5s in alternate gather but not in sourmash gather: {total_f_weighted_query}")
 
+    # for the md5s in both sourmash gather and alternate gather, compute the sum of f_unique_weighted
+    total_f_unique_weighted = 0
+    for md5 in commond_md5s:
+        sourmash_gather_row = df_sourmash_gather.loc[md5]
+        total_f_unique_weighted += sourmash_gather_row['f_unique_weighted']
+
+    print(f"Total f_unique_weighted for md5s in both sourmash gather and alternate gather: {total_f_unique_weighted}")
+
 if __name__ == '__main__':
     main()

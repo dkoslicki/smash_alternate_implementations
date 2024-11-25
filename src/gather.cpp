@@ -130,11 +130,21 @@ void do_gather(Arguments& args) {
 
         // find the ref sketch with largest overlap with the current query
         for (size_t i = 0; i < ref_sketches.size(); i++) {
-            if (num_intersection_values[i] <= max_intersection_value) {
-                continue;
+            if (num_intersection_values[i] > max_intersection_value) {
+                max_intersection_value = num_intersection_values[i];
+                max_intersection_ref_id = i;
+            } else if (num_intersection_values[i] == max_intersection_value) {
+                if ( num_intersection_values_orig[i] > num_intersection_values_orig[max_intersection_ref_id] ) {
+                    max_intersection_value = num_intersection_values[i];
+                    max_intersection_ref_id = i;
+                } else if ( num_intersection_values_orig[i] == num_intersection_values_orig[max_intersection_ref_id] ) {
+                    if ( ref_sketches[i].size() > ref_sketches[max_intersection_ref_id].size() ) {
+                        max_intersection_value = num_intersection_values[i];
+                        max_intersection_ref_id = i;
+                    }
+                }
             }
-            max_intersection_value = num_intersection_values[i];
-            max_intersection_ref_id = i;
+            
         }
 
         // if overlap is below threshold then stop

@@ -33,6 +33,8 @@ def main():
                 print(f"alternate gather md5: {alternate_gather_md5s_list[j]}")
                 print('--------')
 
+            break
+
     sourmash_gather_md5s = set(df_sourmash_gather.index)
     alternate_gather_md5s = set(df_alternate_gather.index)
     commond_md5s = sourmash_gather_md5s & alternate_gather_md5s

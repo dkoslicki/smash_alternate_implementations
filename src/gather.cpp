@@ -125,8 +125,8 @@ void do_gather(Arguments& args) {
     while( true ) {
         
         // find the id of the ref sketch with the maximum number of intersections
-        size_t max_intersection_value = 0;
-        size_t max_intersection_ref_id = 0;
+        size_t max_intersection_value = -1;
+        size_t max_intersection_ref_id = -1;
 
         // find the ref sketch with largest overlap with the current query
         for (size_t i = 0; i < ref_sketches.size(); i++) {
@@ -157,6 +157,10 @@ void do_gather(Arguments& args) {
                     break;
                 }
             }
+
+            // show both indices
+            cout << "Index of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << i << endl;
+            cout << "Index of md5: 404c2d0a233dc79a88353930897b2669: " << max_intersection_ref_id << endl;
 
             // show the num intersection values of the two md5s
             cout << "Num intersection value of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << num_intersection_values[i] << endl;

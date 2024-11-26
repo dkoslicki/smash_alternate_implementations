@@ -140,7 +140,14 @@ void do_gather(Arguments& args) {
                 max_intersection_value_orig = num_intersection_values_orig[i];
                 max_sketch_size = ref_sketches[i].size();
                 max_intersection_ref_id = i;
-            } 
+            } else if (num_intersection_values[i] == max_intersection_value) {
+                if (ref_sketches[i].name < max_name) {
+                    max_intersection_value = num_intersection_values[i];
+                    max_intersection_value_orig = num_intersection_values_orig[i];
+                    max_sketch_size = ref_sketches[i].size();
+                    max_intersection_ref_id = i;
+                }
+            }
             
         }
 

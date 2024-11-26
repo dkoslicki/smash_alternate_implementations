@@ -126,20 +126,35 @@ void do_gather(Arguments& args) {
         
         // find the id of the ref sketch with the maximum number of intersections
         size_t max_intersection_value = num_intersection_values[0];
+        size_t max_intersection_value_orig = num_intersection_values_orig[0];
+        size_t max_sketch_size = ref_sketches[0].size();
         size_t max_intersection_ref_id = 0;
 
         // find the ref sketch with largest overlap with the current query
         for (size_t i = 1; i < ref_sketches.size(); i++) {
+            
+            // if the current ref sketch has more intersections than the max
+            // then update the max values
             if (num_intersection_values[i] > max_intersection_value) {
                 max_intersection_value = num_intersection_values[i];
+                max_intersection_value_orig = num_intersection_values_orig[i];
+                max_sketch_size = ref_sketches[i].size();
                 max_intersection_ref_id = i;
             } else if (num_intersection_values[i] == max_intersection_value) {
-                if ( num_intersection_values_orig[i] > num_intersection_values_orig[max_intersection_ref_id] ) {
+                // if the current ref sketch has the same number of intersections as the max
+                // then check the sketch size
+                if (num_intersection_values_orig[i] > max_intersection_value_orig) {
                     max_intersection_value = num_intersection_values[i];
+                    max_intersection_value_orig = num_intersection_values_orig[i];
+                    max_sketch_size = ref_sketches[i].size();
                     max_intersection_ref_id = i;
-                } else if ( num_intersection_values_orig[i] == num_intersection_values_orig[max_intersection_ref_id] ) {
-                    if ( ref_sketches[i].size() > ref_sketches[max_intersection_ref_id].size() ) {
+                } else if (num_intersection_values_orig[i] == max_intersection_value_orig) {
+                    // if the current ref sketch has the same number of intersections as the max
+                    // and the same sketch size as the max, then check the md5
+                    if (ref_sketches[i].size() > max_sketch_size) {
                         max_intersection_value = num_intersection_values[i];
+                        max_intersection_value_orig = num_intersection_values_orig[i];
+                        max_sketch_size = ref_sketches[i].size();
                         max_intersection_ref_id = i;
                     }
                 }

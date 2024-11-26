@@ -13,7 +13,11 @@ def parse_args():
 def main():
     args = parse_args()
 
-    df_sourmash_gather = pd.read_csv(args.sourmash_gather_file).set_index('md5')
+    try:
+        df_sourmash_gather = pd.read_csv(args.sourmash_gather_file).set_index('md5')
+    except:
+        df_sourmash_gather = pd.read_csv(args.sourmash_gather_file).set_index('match_md5')
+
     df_alternate_gather = pd.read_csv(args.alternate_gather_file).set_index('md5')
 
     sourmash_gather_md5s_list = df_sourmash_gather.index.tolist()

@@ -214,9 +214,7 @@ void do_gather(Arguments& args) {
 
     delete[] num_intersection_values;
     delete[] num_intersection_values_orig;
-    struct rlimit limit = {0, 0};
-    setrlimit(RLIMIT_CORE, &limit);
-    terminate();
+    
 }
 
 

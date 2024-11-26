@@ -164,35 +164,34 @@ void do_gather(Arguments& args) {
         }
 
         // debug
-        if ( ref_sketches[max_intersection_ref_id].md5 == "404c2d0a233dc79a88353930897b2669" ) {
-            // find the index of md5: 2b4415d7dffc931725451dcf7cc2f4a0
+        if ( ref_sketches[max_intersection_ref_id].md5 == "9bb222123fd174995e18dc755b081a0c" ) {
             size_t i = 0;
             for (i = 0; i < ref_sketches.size(); i++) {
-                if ( ref_sketches[i].md5 == "2b4415d7dffc931725451dcf7cc2f4a0" ) {
-                    cout << "Found the index of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << i << endl;
+                if ( ref_sketches[i].md5 == "a73f8e6979535e06a0efcb2b64bccf1d" ) {
+                    cout << "Found the index of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << i << endl;
                     break;
                 }
             }
 
             // show both indices
-            cout << "Index of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << i << endl;
-            cout << "Index of md5: 404c2d0a233dc79a88353930897b2669: " << max_intersection_ref_id << endl;
+            cout << "Index of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << i << endl;
+            cout << "Index of md5: 9bb222123fd174995e18dc755b081a0c: " << max_intersection_ref_id << endl;
 
             // show the num intersection values of the two md5s
-            cout << "Num intersection value of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << num_intersection_values[i] << endl;
-            cout << "Num intersection value of md5: 404c2d0a233dc79a88353930897b2669: " << num_intersection_values[max_intersection_ref_id] << endl;
+            cout << "Num intersection value of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << num_intersection_values[i] << endl;
+            cout << "Num intersection value of md5: 9bb222123fd174995e18dc755b081a0c: " << num_intersection_values[max_intersection_ref_id] << endl;
 
             // show the sketch sizes
-            cout << "Sketch size of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << ref_sketches[i].size() << endl;
-            cout << "Sketch size of md5: 404c2d0a233dc79a88353930897b2669: " << ref_sketches[max_intersection_ref_id].size() << endl;
+            cout << "Sketch size of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << ref_sketches[i].size() << endl;
+            cout << "Sketch size of md5: 9bb222123fd174995e18dc755b081a0c: " << ref_sketches[max_intersection_ref_id].size() << endl;
 
             // show the names
-            cout << "Name of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << ref_sketches[i].name << endl;
-            cout << "Name of md5: 404c2d0a233dc79a88353930897b2669: " << ref_sketches[max_intersection_ref_id].name << endl;
+            cout << "Name of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << ref_sketches[i].name << endl;
+            cout << "Name of md5: 9bb222123fd174995e18dc755b081a0c: " << ref_sketches[max_intersection_ref_id].name << endl;
 
             // show the orig overlaps
-            cout << "Orig overlap of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << num_intersection_values_orig[i] << endl;
-            cout << "Orig overlap of md5: 404c2d0a233dc79a88353930897b2669: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
+            cout << "Orig overlap of md5: a73f8e6979535e06a0efcb2b64bccf1d: " << num_intersection_values_orig[i] << endl;
+            cout << "Orig overlap of md5: 9bb222123fd174995e18dc755b081a0c: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
 
             exit(-1);
 

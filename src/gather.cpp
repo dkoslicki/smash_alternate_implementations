@@ -147,6 +147,37 @@ void do_gather(Arguments& args) {
             
         }
 
+        // debug
+        if ( ref_sketches[max_intersection_ref_id].md5 == "404c2d0a233dc79a88353930897b2669" ) {
+            // find the index of md5: 2b4415d7dffc931725451dcf7cc2f4a0
+            size_t i = 0;
+            for (i = 0; i < ref_sketches.size(); i++) {
+                if ( ref_sketches[i].md5 == "2b4415d7dffc931725451dcf7cc2f4a0" ) {
+                    cout << "Found the index of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << i << endl;
+                    break;
+                }
+            }
+
+            // show the num intersection values of the two md5s
+            cout << "Num intersection value of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << num_intersection_values[i] << endl;
+            cout << "Num intersection value of md5: 404c2d0a233dc79a88353930897b2669: " << num_intersection_values[max_intersection_ref_id] << endl;
+
+            // show the sketch sizes
+            cout << "Sketch size of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << ref_sketches[i].size() << endl;
+            cout << "Sketch size of md5: 404c2d0a233dc79a88353930897b2669: " << ref_sketches[max_intersection_ref_id].size() << endl;
+
+            // show the names
+            cout << "Name of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << ref_sketches[i].name << endl;
+            cout << "Name of md5: 404c2d0a233dc79a88353930897b2669: " << ref_sketches[max_intersection_ref_id].name << endl;
+
+            // show the orig overlaps
+            cout << "Orig overlap of md5: 2b4415d7dffc931725451dcf7cc2f4a0: " << num_intersection_values_orig[i] << endl;
+            cout << "Orig overlap of md5: 404c2d0a233dc79a88353930897b2669: " << num_intersection_values_orig[max_intersection_ref_id] << endl;
+
+            exit(-1);
+
+        }
+
         // if overlap is below threshold then stop
         if (max_intersection_value < args.threshold_bp) {
             cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;

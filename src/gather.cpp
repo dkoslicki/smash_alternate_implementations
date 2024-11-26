@@ -125,11 +125,11 @@ void do_gather(Arguments& args) {
     while( true ) {
         
         // find the id of the ref sketch with the maximum number of intersections
-        size_t max_intersection_value = -1;
-        size_t max_intersection_ref_id = -1;
+        size_t max_intersection_value = num_intersection_values[0];
+        size_t max_intersection_ref_id = 0;
 
         // find the ref sketch with largest overlap with the current query
-        for (size_t i = 0; i < ref_sketches.size(); i++) {
+        for (size_t i = 1; i < ref_sketches.size(); i++) {
             if (num_intersection_values[i] > max_intersection_value) {
                 max_intersection_value = num_intersection_values[i];
                 max_intersection_ref_id = i;

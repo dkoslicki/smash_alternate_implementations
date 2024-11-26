@@ -140,10 +140,18 @@ void do_gather(Arguments& args) {
                 max_intersection_value_orig = num_intersection_values_orig[i];
                 max_sketch_size = ref_sketches[i].size();
                 max_intersection_ref_id = i;
-            } 
+            } else if (num_intersection_values[i] == max_intersection_value) {
+                if (ref_sketches[i].name < max_name) {
+                    max_intersection_value = num_intersection_values[i];
+                    max_intersection_value_orig = num_intersection_values_orig[i];
+                    max_sketch_size = ref_sketches[i].size();
+                    max_intersection_ref_id = i;
+                }
+            }
             
         }
 
+        /*
         // debug
         if ( ref_sketches[max_intersection_ref_id].md5 == "9bb222123fd174995e18dc755b081a0c" ) {
             size_t i = 0;
@@ -177,6 +185,7 @@ void do_gather(Arguments& args) {
             exit(-1);
 
         }
+        */
 
         // if overlap is below threshold then stop
         if (max_intersection_value < args.threshold_bp) {

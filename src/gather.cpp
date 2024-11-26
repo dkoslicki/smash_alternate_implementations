@@ -133,7 +133,6 @@ void do_gather(Arguments& args) {
 
         // find the ref sketch with largest overlap with the current query
         for (size_t i = 1; i < ref_sketches.size(); i++) {
-            
             // if the current ref sketch has more intersections than the max
             // then update the max values
             if (num_intersection_values[i] > max_intersection_value) {
@@ -142,22 +141,11 @@ void do_gather(Arguments& args) {
                 max_sketch_size = ref_sketches[i].size();
                 max_intersection_ref_id = i;
             } else if (num_intersection_values[i] == max_intersection_value) {
-                // if the current ref sketch has the same number of intersections as the max
-                // then check the sketch size
-                if (num_intersection_values_orig[i] > max_intersection_value_orig) {
+                if (ref_sketches[i].name < max_name) {
                     max_intersection_value = num_intersection_values[i];
                     max_intersection_value_orig = num_intersection_values_orig[i];
                     max_sketch_size = ref_sketches[i].size();
                     max_intersection_ref_id = i;
-                } else if (num_intersection_values_orig[i] == max_intersection_value_orig) {
-                    // if the current ref sketch has the same number of intersections as the max
-                    // and the same sketch size as the max, then check the md5
-                    if (ref_sketches[i].name < max_name) {
-                        max_intersection_value = num_intersection_values[i];
-                        max_intersection_value_orig = num_intersection_values_orig[i];
-                        max_sketch_size = ref_sketches[i].size();
-                        max_intersection_ref_id = i;
-                    }
                 }
             }
             

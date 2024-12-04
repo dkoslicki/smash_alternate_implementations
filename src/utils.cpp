@@ -181,7 +181,6 @@ void show_empty_sketches(const std::vector<int>& empty_sketch_ids) {
 
 
 
-/*
 
 void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int query_sketch_end_index, 
                                             int thread_id, std::string out_dir, 
@@ -325,4 +324,3 @@ void compute_intersection_matrix(const std::vector<Sketch>& sketches_query,
     delete[] intersectionMatrix;
 }
 
-*/

@@ -119,13 +119,13 @@ void show_empty_sketches(const std::vector<int>&);
  * @param num_threads The number of threads to use
  */
 
-void compute_intersection_matrix(const std::vector<Sketch>& sketches_query,
-                                const std::vector<Sketch>& sketches_ref, 
+void compute_intersection_matrix(std::vector<Sketch>& sketches_query,
+                                std::vector<Sketch>& sketches_ref, 
                                 MultiSketchIndex& multi_sketch_index_ref,
-                                const std::string& out_dir, 
+                                std::string& out_dir, 
                                 std::vector<std::vector<int>>& similars,
                                 double containment_threshold,
-                                const int num_passes, const int num_threads);
+                                int num_passes, int num_threads);
 
 
 

@@ -47,6 +47,22 @@ class Sketch {
             this->seed = 0;
         }
 
+        // copy constructor
+        Sketch(const Sketch& sketch) {
+            this->hashes = sketch.hashes;
+            this->file_path = sketch.file_path;
+            this->name = sketch.name;
+            this->md5 = sketch.md5;
+            this->ksize = sketch.ksize;
+            this->max_hash = sketch.max_hash;
+            this->seed = sketch.seed;
+        }
+
+        // destructor
+        ~Sketch() {
+            this->hashes.clear();
+        }
+
         void show();
 
         void show_hashes() {

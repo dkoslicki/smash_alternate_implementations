@@ -190,12 +190,16 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
                                             MultiSketchIndex& multi_sketch_index_ref,
                                             int** intersectionMatrix, 
                                             double containment_threshold,
-                                            std::vector<std::vector<int>>& similars) {
+                                            std::vector<std::vector<int>>& similars,
+                                            bool show_progress = false) {
     
     const int num_sketches_ref = sketches_ref.size();
     const int num_sketches_query = sketches_query.size();
 
     // process the sketches in the range [sketch_start_index, sketch_end_index)
+    if (show_progress) {
+        std::cout << "Computation progress: 0.00%";
+    }
     for (uint i = query_sketch_start_index; i < query_sketch_end_index; i++) {
         for (int j = 0; j < sketches_query[i].size(); j++) {
             hash_t hash = sketches_query[i][j];
@@ -207,6 +211,15 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
                 intersectionMatrix[i-negative_offset][ref_sketch_indices[k]]++;
             }
         }
+        if (show_progress) {
+            double percentage = 100.0 * (i - query_sketch_start_index) / (query_sketch_end_index - query_sketch_start_index);
+            // show percetage progress, only two decimal points
+            std::cout << "\rComputation progress: " << std::fixed << std::setprecision(2) << percentage << "%";
+        }
+    }
+    if (show_progress) {
+        std::cout << "\rComputation progress: " << std::fixed << std::setprecision(2) << 100.00 << "%";
+        std::cout << std::endl;
     }
 
     // write the similarity values to file. filename: out_dir/passid_threadid.txt, where id is thread id in 3 digits
@@ -218,7 +231,16 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
     std::string filename = out_dir + "/" + pass_id_str + "_" + id_in_three_digits_str + ".txt";
     std::ofstream outfile(filename);
 
+    // check if the file is open
+    if (!outfile.is_open()) {
+        std::cerr << "Could not open the file: " << filename << std::endl;
+        exit(1);
+    }
+
     // only write the values if larger than the threshold
+    if (show_progress) {
+        std::cout << "Writing progress: 0.00%";
+    }
     for (int i = query_sketch_start_index; i < query_sketch_end_index; i++) {
         for (uint j = 0; j < num_sketches_ref; j++) {
             // if nothing in the intersection, then skip
@@ -248,6 +270,16 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
             outfile << i << "," << j << "," << jaccard << "," << containment_i_in_j << "," << containment_j_in_i << std::endl;
             similars[i].push_back(j);
         }
+        if (show_progress) {
+            double percentage = 100.0 * (i - query_sketch_start_index) / (query_sketch_end_index - query_sketch_start_index);
+            // show percetage progress, only two decimal points
+            std::cout << "\rWriting progress: " << std::fixed << std::setprecision(2) << percentage << "%";
+        }
+    }
+
+    if (show_progress) {
+        std::cout << "\rWriting progress: " << std::fixed << std::setprecision(2) << 100.00 << "%";
+        std::cout << std::endl;
     }
 
     outfile.close();
@@ -274,10 +306,12 @@ void compute_intersection_matrix(std::vector<Sketch>& sketches_query,
         intersectionMatrix[i] = new int[num_sketches_ref];
     }
 
-    // allocate memory for the similars
-    for (int i = 0; i < num_sketches_query; i++) {
-        similars.push_back(std::vector<int>());
+    // allocate memory for the similars if not already allocated
+    if (similars.size() != num_sketches_query) {
+        similars.clear();
+        similars.resize(num_sketches_query);
     }
+    
 
     for (int pass_id = 0; pass_id < num_passes; pass_id++) {
         // set zeros in the intersection matrix
@@ -299,14 +333,14 @@ void compute_intersection_matrix(std::vector<Sketch>& sketches_query,
         for (int i = 0; i < num_threads; i++) {
             int start_query_index_this_thread = sketch_idx_start_this_pass + i * chunk_size;
             int end_query_index_this_thread = (i == num_threads - 1) ? sketch_idx_end_this_pass : sketch_idx_start_this_pass + (i + 1) * chunk_size;
-            // use emplace_back to avoid copy
+            // use emplace_back to avoid copy, set the last thread to show progress
             std::thread t(compute_intersection_matrix_by_sketches, 
                             start_query_index_this_thread, end_query_index_this_thread, 
                             i, out_dir, pass_id, negative_offset,
                             std::ref(sketches_query), std::ref(sketches_ref), 
                             std::ref(multi_sketch_index_ref), 
                             intersectionMatrix, containment_threshold, 
-                            std::ref(similars));
+                            std::ref(similars), i == num_threads - 1);
             threads.emplace_back(std::move(t));
         }
 

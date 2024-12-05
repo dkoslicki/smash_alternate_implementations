@@ -44,7 +44,7 @@ typedef unsigned long long int hash_t;
 
 
 
-void do_gather(Arguments& args) {
+void do_prefetch(Arguments& args) {
     // data structures
     Sketch query_sketch; 
     vector<string> ref_sketch_paths;
@@ -86,141 +86,59 @@ void do_gather(Arguments& args) {
     // show num of hashes in ref
     cout << "Number of distinct kmers in the references: " << ref_index.size() << endl;
 
-    // start gather
-    cout << "Now searching the query kmers against the references..." << endl;
-
-    vector<hash_t> query_hashes_present_in_ref;
-    for (hash_t hash_value : query_sketch.hashes) {
-        if ( ref_index.hash_exists(hash_value) ) {
-            query_hashes_present_in_ref.push_back(hash_value);
-        }
-    }
-    cout << "Number of kmers in query present in the references: " << query_hashes_present_in_ref.size() << endl;
-
+    // start prefetch
+    cout << "Now searching the query kmers against the reference kmers..." << endl;
     size_t* num_intersection_values = new size_t[ref_sketches.size()];
-    size_t* num_intersection_values_orig = new size_t[ref_sketches.size()];
     for (size_t i = 0; i < ref_sketches.size(); i++) {
         num_intersection_values[i] = 0;
-        num_intersection_values_orig[i] = 0;
     }
-    for (hash_t hash_value : query_hashes_present_in_ref) {
+
+    for (hash_t hash_value : query_sketch.hashes) {
         vector<int> matching_ref_ids = ref_index.get_sketch_indices(hash_value);
         for (int ref_id : matching_ref_ids) {
             num_intersection_values[ref_id]++;
-            num_intersection_values_orig[ref_id]++;
         }
     }
-
-    // build an unordered map of the hashes in the query sketch
-    unordered_map<hash_t, bool> query_hash_map;
-    for (hash_t hash_value : query_sketch.hashes) {
-        query_hash_map[hash_value] = true;
+    
+    // now sort the ref sketches based on the number of intersections
+    vector<tuple<int, size_t>> ref_id_num_intersections;
+    for (int i = 0; i < ref_sketches.size(); i++) {
+        ref_id_num_intersections.push_back(make_tuple(i, num_intersection_values[i]));
     }
 
-    int num_iterations = 0;
-    vector<tuple<
-                int, size_t, size_t, double, double, double, double
-                    >> results;
-
-    while( true ) {
-        
-        // find the id of the ref sketch with the maximum number of intersections
-        size_t max_intersection_value = num_intersection_values[0];
-        size_t max_intersection_ref_id = 0;
-        
-        // find the ref sketch with largest overlap with the current query
-        for (size_t i = 1; i < ref_sketches.size(); i++) {
-            // if the current ref sketch has more intersections than the max
-            // then update the max values
-            if (num_intersection_values[i] > max_intersection_value) {
-                max_intersection_value = num_intersection_values[i];
-                max_intersection_ref_id = i;
-            }
-            
-        }
-        
-
-        // if overlap is below threshold then stop
-        if (max_intersection_value < args.threshold_bp) {
-            cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;
-            cout << "Num overlap is less than the threshold of " << args.threshold_bp << " bp. Stopping gather..." << endl;
-            break;
-        }
-
-        // compute the relevant values
-        double f_unique_query = (double)max_intersection_value / (double)query_sketch.size();
-        double f_unique_weighted = f_unique_query;
-        double f_orig_query = (double)num_intersection_values_orig[max_intersection_ref_id] / (double)query_sketch.size();
-        double f_match = (double)max_intersection_value / (double)ref_sketches[max_intersection_ref_id].size();
-
-        // show match id and match value
-        cout << "Matched " << max_intersection_ref_id+1 << "\t-th genome, overlap now: " << max_intersection_value << endl;
-        results.push_back(
-            make_tuple(max_intersection_ref_id, 
-                        max_intersection_value, 
-                        num_intersection_values_orig[max_intersection_ref_id],
-                        f_unique_query,
-                        f_unique_weighted,
-                        f_orig_query,
-                        f_match));
-
-        // remove the ref sketch with the maximum number of intersections
-        for (hash_t hash_value : ref_sketches[max_intersection_ref_id].hashes) {
-            // remove the hash value from the index
-            vector<int> removed_ids = ref_index.remove_hash(hash_value);
-
-            // removed ids are the ids of the references in which this hash appeared
-            // if this hash is in the query, then decrememt the intersection values appropriately
-            // and finally, remove the hash from the query hash map
-            if (query_hash_map.find(hash_value) != query_hash_map.end()) {
-                for (int ref_id : removed_ids) {
-                    num_intersection_values[ref_id]--;
-                }
-                query_hash_map.erase(hash_value);
-            }
-        }
-
-    }
+    sort(ref_id_num_intersections.begin(), ref_id_num_intersections.end(), 
+        [](const tuple<int, size_t>& a, const tuple<int, size_t>& b) {
+            return get<1>(a) > get<1>(b);
+        });
 
     // write the results to the output file
-    cout << "Writing the results to " << args.output_filename << "..." << endl;
-    ofstream output_file(args.output_filename);
-    output_file << "num_overlap_orig,num_overlap,f_orig_query,f_match,f_unique_query,f_weighted_query,name,md5" << endl;
-    output_file << fixed << setprecision(10);
-    
-    for (auto result : results) {
-        int sketch_index = get<0>(result);
-        int num_overlap = get<1>(result);
-        int num_overlap_orig = get<2>(result);
-        double f_unique_to_query = get<3>(result);
-        double f_unique_weighted = get<4>(result);
-        double f_orig_query = get<5>(result);
-        double f_match = get<6>(result);
-
-        string file_path = ref_sketches[sketch_index].file_path;
-        string name = ref_sketches[sketch_index].name;
-        string md5 = ref_sketches[sketch_index].md5;
-        
-        output_file << num_overlap_orig << "," << num_overlap << "," 
-                    << f_orig_query << "," << f_match << "," 
-                    << f_unique_to_query << "," << f_unique_weighted 
-                    << ",\"" << name << "\"," << md5 << endl;
+    ofstream outfile(args.output_filename);
+    outfile << "ref_id,num_intersections,containment_query_ref,containment_ref_query,jaccard" << endl;
+    for (auto ref_id_num_intersection : ref_id_num_intersections) {
+        int ref_id = get<0>(ref_id_num_intersection);
+        size_t num_intersection = get<1>(ref_id_num_intersection);
+        if (num_intersection < args.threshold_bp) {
+            break;
+        }
+        double containment_query_ref = 1.0 * num_intersection / query_sketch.size();
+        double containment_ref_query = 1.0 * num_intersection / ref_sketches[ref_id].size();
+        double jaccard = 1.0 * num_intersection / (query_sketch.size() + ref_sketches[ref_id].size() - num_intersection);
+        outfile << ref_id << "," << num_intersection << "," << containment_query_ref << "," << containment_ref_query << "," << jaccard << endl;
     }
 
-    output_file.close();
-
+    outfile.close();
     cout << "Results written to " << args.output_filename << endl;
     cout << "Cleaning up and exiting... (may take some time)" << endl;
 
+    // clean up
     delete[] num_intersection_values;
-    delete[] num_intersection_values_orig;
     
 }
 
 
 
 void parse_args(int argc, char** argv, Arguments &arguments) {
-    argparse::ArgumentParser parser("gather: find all matching refs for a query sketch");
+    argparse::ArgumentParser parser("prefetch: find all matching refs for a query sketch");
 
     parser.add_argument("query_path")
         .help("The path to the query sketch")
@@ -290,7 +208,7 @@ int main(int argc, char** argv) {
     Arguments arguments;
     parse_args(argc, argv, arguments);
     show_args(arguments);
-    do_gather(arguments);    
+    do_prefetch(arguments);    
 
     return 0;
 

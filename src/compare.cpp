@@ -98,7 +98,11 @@ void do_compare(Arguments& args) {
         combine_command += filename + " ";
     }
     combine_command += " > " + args.output_filename;
-    system(combine_command.c_str());
+    // call the system command and check if it is successful
+    if (system(combine_command.c_str()) != 0) {
+        cerr << "Error in combining the files." << endl;
+        exit(1);
+    }
     cout << "Results written to " << args.output_filename << endl;
 
     // Clean up

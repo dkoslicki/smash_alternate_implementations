@@ -92,12 +92,18 @@ void do_compare(Arguments& args) {
             files_to_combine.push_back(filename);
         }
     }
+
+    // write the header in the output file
+    ofstream output_file(args.output_filename);
+    output_file << "query_id, query_name, query_md5, match_id, match_name, match_md5, jaccard, containment_query_in_match, containment_match_in_query" << endl;
+    output_file.close();
+
     // combining command: cat 
     string combine_command = "cat ";
     for (string filename : files_to_combine) {
         combine_command += filename + " ";
     }
-    combine_command += " > " + args.output_filename;
+    combine_command += " >> " + args.output_filename;
     // call the system command and check if it is successful
     if (system(combine_command.c_str()) != 0) {
         cerr << "Error in combining the files." << endl;

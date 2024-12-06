@@ -267,7 +267,14 @@ void compute_intersection_matrix_by_sketches(int query_sketch_start_index, int q
                 continue;
             }
 
-            outfile << i << "," << j << "," << jaccard << "," << containment_i_in_j << "," << containment_j_in_i << std::endl;
+            std::string query_name = sketches_query[i].name;
+            std::string ref_name = sketches_ref[j].name;
+            std::string query_md5 = sketches_query[i].md5;
+            std::string ref_md5 = sketches_ref[j].md5;
+
+            // write i, query_name, query_md5, j, ref_name, ref_md5, jaccard, containment_i_in_j, containment_j_in_i
+            outfile << i << ",\"" << query_name << "\"," << query_md5 << "," << j << ",\"" << ref_name << "\"," << ref_md5 << "," << jaccard << "," << containment_i_in_j << "," << containment_j_in_i << std::endl;
+            
             similars[i].push_back(j);
         }
         if (show_progress) {
